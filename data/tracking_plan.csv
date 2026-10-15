@@ -1,0 +1,9 @@
+﻿event_name,trigger,key_parameters,business_purpose
+stream_start,Inicio de reproducción en vivo,"stream_id, session_id, platform, connection_type",Medir inicios de sesión y concurrencia
+live_playback_heartbeat,Cada 60 segundos de reproducción,"live_latency_ms, bitrate_kbps, wifi_rssi_dbm, amba_zone_id",Monitorear latencia y calidad de reproducción
+playback_microcut_detected,Buffer stall mayor a 1500 ms,"stall_duration_ms, wifi_rssi_dbm, device_power_status, thermal_state",Clasificar causa raíz de microcortes
+self_diagnosis_started,Usuario abre el diagnóstico guiado,"incident_id, diagnosed_cause, variant",Medir adopción del flujo de autogestión
+router_photo_uploaded,Usuario carga una foto del router,"incident_id, wifi_rssi_dbm",Medir avance del diagnóstico de Wi-Fi
+self_diagnosis_resolved,Incidente resuelto sin visita en siete días,"incident_id, resolution_outcome, avoided_visit_cost_usd",Calcular contención y ahorro operativo
+technical_visit_requested,Usuario solicita visita técnica,"incident_id, diagnosed_cause, visit_cost_usd",Medir fallas no contenidas
+roaming_stream_alert,Reproducción sobre roaming internacional,"country_iso, roaming_mb_consumed, roaming_cost_usd, bitrate_cap_kbps",Controlar costo mayorista de datos

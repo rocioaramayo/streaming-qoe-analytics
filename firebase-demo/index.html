@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Streaming QoE Lab</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <div class="badge">DEMO · DATOS SINTÉTICOS</div>
+    <h1>Streaming QoE Lab</h1>
+    <p class="lead">Prototipo instrumentado con Firebase Analytics y Remote Config.</p>
+
+    <section class="status">
+      <div><span>Diagnóstico inteligente</span><strong id="smartStatus">cargando…</strong></div>
+      <div><span>Bitrate cap roaming</span><strong id="bitrateStatus">cargando…</strong></div>
+      <div><span>Variante</span><strong id="variantStatus">local</strong></div>
+    </section>
+
+    <section>
+      <h2>Simular recorrido</h2>
+      <div class="actions">
+        <button data-event="stream_start">Iniciar streaming</button>
+        <button data-event="live_playback_heartbeat">Enviar heartbeat</button>
+        <button data-event="playback_microcut_detected" class="warning">Detectar microcorte</button>
+        <button data-event="self_diagnosis_started">Iniciar diagnóstico</button>
+        <button data-event="router_photo_uploaded">Subir foto del router</button>
+        <button data-event="self_diagnosis_resolved" class="success">Resolver sin visita</button>
+        <button data-event="technical_visit_requested">Solicitar visita</button>
+        <button data-event="roaming_stream_alert">Alerta de roaming</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Consola de eventos</h2>
+      <ol id="eventLog"><li>Esperando interacción…</li></ol>
+    </section>
+    <p class="disclaimer">Caso de portfolio independiente. Sin datos de clientes reales ni afiliación con una empresa.</p>
+  </main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
+
