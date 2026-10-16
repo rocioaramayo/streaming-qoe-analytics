@@ -10,7 +10,10 @@
    - `external_amba_alerts.csv` → `external_amba_alerts`
    - `tracking_plan.csv` → `tracking_plan`
 4. Abrir cada archivo de `sql/`, reemplazar `YOUR_PROJECT_ID` y ejecutarlo en orden.
-5. Ejecutar `07_data_quality_checks.sql`: todos los controles críticos deben dar cero.
+5. Si `tracking_plan.csv` quedó con columnas `string_field_*`, ejecutar
+   `08_tracking_plan_view.sql` para exponer el esquema normalizado y excluir
+   la fila de encabezado importada como dato.
+6. Ejecutar `07_data_quality_checks.sql`: todos los controles críticos deben dar cero.
 
 ## 2. Looker Studio
 
