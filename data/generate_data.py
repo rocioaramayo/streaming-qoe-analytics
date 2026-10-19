@@ -15,6 +15,11 @@ OUT = Path(__file__).resolve().parent
 
 rng = random.Random(SEED)
 
+
+def bounded_int(value: float, lower: int, upper: int) -> int:
+    """Round and clip a simulated sensor value to a realistic range."""
+    return max(lower, min(upper, round(value)))
+
 ZONES = [
     ("AMBA_NORTE_NODO_14", "Vicente López", "Buenos Aires", -34.5167, -58.4833, "EDENOR"),
     ("AMBA_NORTE_NODO_22", "Tigre", "Buenos Aires", -34.4251, -58.5797, "EDENOR"),
@@ -230,10 +235,26 @@ for user_id, variant, zone, platform, tier, assignment in users:
             incident_emitted = True
             incident_id = f"inc_{user_id[4:]}"
             cause = assignment["primary_diagnosis"]
-            wifi = rng.randrange(-89, -76) if cause == "WIFI_WEAK" else rng.randrange(-70, -45)
-            power = "VOLTAGE_DROP" if cause == "DEVICE_POWER_OR_THERMAL" and rng.random() < 0.6 else "NORMAL"
-            thermal = "CRITICAL_OVERHEAT" if cause == "DEVICE_POWER_OR_THERMAL" and power == "NORMAL" else "NORMAL"
-            ext = "ACTIVE_POWER_OR_CLIMATE_ALERT" if cause == "EXTERNAL_ZONE" else "NONE"
+            # Sensor signals overlap deliberately: production telemetry is noisy,
+            # incomplete and may contain false positives. This prevents the ML
+            # task from becoming a deterministic rules engine.
+            wifi_center = -79 if cause == "WIFI_WEAK" else -64
+            wifi = bounded_int(rng.gauss(wifi_center, 7), -92, -40)
+
+            device_issue = cause == "DEVICE_POWER_OR_THERMAL"
+            power = "VOLTAGE_DROP" if rng.random() < (0.55 if device_issue else 0.04) else "NORMAL"
+            thermal = "CRITICAL_OVERHEAT" if rng.random() < (0.45 if device_issue else 0.03) else "NORMAL"
+
+            zone_issue = cause == "EXTERNAL_ZONE"
+            ext = "ACTIVE_POWER_OR_CLIMATE_ALERT" if rng.random() < (0.72 if zone_issue else 0.05) else "NONE"
+
+            network_issue = cause == "NETWORK_OR_CDN"
+            latency_center = 30000 if network_issue else 22000
+            bitrate_center = 850 if network_issue else 1350
+            stall_center = 9000 if network_issue else 6200
+            latency = bounded_int(rng.gauss(latency_center, 6000), 10000, 45000)
+            bitrate = bounded_int(rng.gauss(bitrate_center, 500), 350, 2600)
+            stall = bounded_int(rng.gauss(stall_center, 3500), 1600, 18000)
             incident_base = dict(base)
             incident_base["incident_id"] = incident_id
             incident_base["external_alert"] = ext
@@ -245,9 +266,9 @@ for user_id, variant, zone, platform, tier, assignment in users:
                 wifi_rssi_dbm=wifi,
                 device_power_status=power,
                 thermal_state=thermal,
-                live_latency_ms=rng.randrange(15000, 38000),
-                bitrate_kbps=rng.randrange(450, 2200),
-                stall_duration_ms=rng.randrange(1600, 15000),
+                live_latency_ms=latency,
+                bitrate_kbps=bitrate,
+                stall_duration_ms=stall,
                 diagnosed_cause=cause,
             )
             if variant.startswith("B_"):

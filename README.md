@@ -1,15 +1,16 @@
 # Streaming QoE Analytics
 
-Caso de estudio end-to-end para monitorear la calidad de experiencia (QoE) de una plataforma de streaming, diagnosticar microcortes y evaluar mediante un experimento A/B un flujo de autogestión.
+Caso de estudio end-to-end para monitorear la calidad de experiencia (QoE) de una plataforma de streaming, diagnosticar microcortes con Machine Learning y evaluar mediante un experimento A/B un flujo de autogestión.
 
 > **Aviso:** proyecto independiente de portfolio, construido con datos 100% sintéticos. No representa información, resultados ni una implementación oficial de Personal Flow.
 
 ## Qué demuestra
 
 - Diseño de tracking con eventos compatibles con un modelo GA4/Firebase.
-- Generación reproducible de 4.000 usuarios y 39.265 eventos.
+- Generación reproducible de 4.000 usuarios y 39.030 eventos.
 - Asignación A/B estable por usuario, sin contaminación entre variantes.
 - Modelado y análisis en BigQuery con controles de calidad.
+- Modelo supervisado y explicable para clasificar la causa raíz de los microcortes.
 - Diseño de un dashboard ejecutivo en Looker Studio.
 - Prototipo web instrumentado con Firebase Analytics y Remote Config.
 - Traducción de señales técnicas en KPIs de experiencia y costos operativos.
@@ -30,6 +31,7 @@ flowchart LR
     D[Remote Config\nvariantes y bitrate] --> A
     B --> E[SQL de calidad\ny métricas]
     E --> F[Looker Studio\n3 páginas]
+    B --> G[Machine Learning\nclasificación de causa raíz]
 ```
 
 Para publicar el proyecto hoy, los CSV se cargan manualmente en BigQuery. La exportación nativa de Firebase puede tardar hasta 48 horas, por lo que queda documentada como evolución de la arquitectura.
@@ -49,6 +51,7 @@ Para publicar el proyecto hoy, los CSV se cargan manualmente en BigQuery. La exp
 
 ```text
 data/             CSV listos para BigQuery + generador reproducible
+ml/               entrenamiento, inferencia y artefactos del modelo
 sql/              creación de tablas, vistas, análisis y pruebas de calidad
 docs/             arquitectura, diccionario, QA y checklist de publicación
 firebase-demo/    prototipo instrumentado para Analytics y Remote Config
@@ -66,7 +69,7 @@ LINKEDIN_POST.md  texto breve y honesto para publicar
 
 ## Stack
 
-BigQuery · SQL · Looker Studio · Firebase Analytics · Remote Config · JavaScript · Python · experimentación A/B
+BigQuery · SQL · Looker Studio · Firebase Analytics · Remote Config · JavaScript · Python · scikit-learn · Machine Learning · experimentación A/B
 
 ## Reproducibilidad
 
@@ -75,4 +78,25 @@ python data/generate_data.py
 ```
 
 El generador usa una semilla fija (`20261015`) y conserva una sola variante por usuario mediante hashing estable.
+
+## Machine Learning
+
+El módulo `ml/` entrena un Random Forest para clasificar la causa raíz de cada
+microcorte a partir de señales técnicas disponibles al detectar el incidente.
+Incluye partición estratificada, validación cruzada, línea base, matriz de
+confusión, importancia de variables, predicciones de prueba y modelo serializado.
+
+Resultados sobre el conjunto de prueba sintético: **78,96% de accuracy**,
+**77,89% de balanced accuracy** y **77,18% de macro F1**, frente a una línea base
+de **25% de balanced accuracy**. Ver metodología y limitaciones en
+[`docs/model_card.md`](docs/model_card.md).
+
+```powershell
+python ml/train_diagnosis_model.py
+python ml/predict_incident.py
+```
+
+Los datos son sintéticos y las métricas no deben interpretarse como rendimiento
+en producción. El valor del proyecto está en demostrar un pipeline reproducible,
+sin fuga de información y conectado con una decisión operativa concreta.
 
