@@ -233,10 +233,31 @@ def main() -> None:
     ).sort_values("importance", ascending=False)
 
     scored = windows.iloc[test_position][
-        ["user_pseudo_id", "session_id", "window_end_ts", TARGET]
+        [
+            "user_pseudo_id",
+            "session_id",
+            "window_end_ts",
+            "platform",
+            "subscription_tier",
+            "connection_type",
+            "amba_zone_id",
+            "latency_last",
+            "latency_mean",
+            "bitrate_last",
+            "bitrate_mean",
+            "wifi_last",
+            "wifi_mean",
+            TARGET,
+        ]
     ].copy()
     scored["microcut_risk_probability"] = probability
     scored["predicted_microcut"] = prediction
+    scored["risk_level"] = np.select(
+        [probability >= 0.75, probability >= 0.40],
+        ["HIGH", "MEDIUM"],
+        default="LOW",
+    )
+    scored["evaluation_split"] = "HOLDOUT_TEST"
 
     with (ARTIFACTS / "metrics.json").open("w", encoding="utf-8") as handle:
         json.dump(metrics, handle, ensure_ascii=False, indent=2)
@@ -244,6 +265,11 @@ def main() -> None:
     report.to_csv(ARTIFACTS / "classification_report.csv", encoding="utf-8-sig")
     importances.to_csv(ARTIFACTS / "feature_importance.csv", index=False, encoding="utf-8-sig")
     scored.to_csv(ARTIFACTS / "test_predictions.csv", index=False, encoding="utf-8-sig")
+    scored.to_csv(
+        ROOT / "data" / "ml_microcut_risk_predictions.csv",
+        index=False,
+        encoding="utf-8-sig",
+    )
     joblib.dump(pipeline, ARTIFACTS / "microcut_risk_model.joblib", compress=3)
 
     fpr, tpr, _ = roc_curve(y_test, probability)

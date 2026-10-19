@@ -9,7 +9,10 @@
    - `experiment_assignments.csv` → `experiment_assignments`
    - `external_amba_alerts.csv` → `external_amba_alerts`
    - `tracking_plan.csv` → `tracking_plan`
-4. Abrir cada archivo de `sql/`, reemplazar `YOUR_PROJECT_ID` y ejecutarlo en orden.
+   - `ml_microcut_risk_predictions.csv` → `ml_microcut_risk_predictions`
+   - `ml_diagnosis_predictions.csv` → `ml_diagnosis_predictions`
+   - `ml_model_metrics.csv` → `ml_model_metrics`
+4. Abrir cada archivo de `sql/`, reemplazar `YOUR_PROJECT_ID` y ejecutarlo en orden, incluido `09_ml_dashboard.sql`.
 5. Si `tracking_plan.csv` quedó con columnas `string_field_*`, ejecutar
    `08_tracking_plan_view.sql` para exponer el esquema normalizado y excluir
    la fila de encabezado importada como dato.
@@ -17,7 +20,7 @@
 
 ## 2. Looker Studio
 
-Seguir `looker/dashboard_build_guide.md`. Para publicar hoy alcanza con tres capturas: overview, causa raíz/mapa y experimento.
+Seguir `looker/dashboard_build_guide.md`. Incluir la cuarta página de predicción y prevención para mostrar el flujo de Machine Learning conectado.
 
 ## 3. Firebase
 

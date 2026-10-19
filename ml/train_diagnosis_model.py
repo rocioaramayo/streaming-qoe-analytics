@@ -180,10 +180,26 @@ def main() -> None:
         }
     ).sort_values("importance", ascending=False)
 
-    scored = incidents.loc[test_idx, ["incident_id", "user_pseudo_id", TARGET]].copy()
+    scored = incidents.loc[
+        test_idx,
+        [
+            "incident_id",
+            "user_pseudo_id",
+            "platform",
+            "subscription_tier",
+            "connection_type",
+            "amba_zone_id",
+            "wifi_rssi_dbm",
+            "live_latency_ms",
+            "bitrate_kbps",
+            "stall_duration_ms",
+            TARGET,
+        ],
+    ].copy()
     scored["predicted_cause"] = predictions
     scored["prediction_confidence"] = probabilities.max(axis=1)
     scored["correct_prediction"] = scored[TARGET].eq(scored["predicted_cause"]).astype(int)
+    scored["evaluation_split"] = "HOLDOUT_TEST"
 
     with (ARTIFACTS / "metrics.json").open("w", encoding="utf-8") as handle:
         json.dump(metrics, handle, ensure_ascii=False, indent=2)
@@ -191,6 +207,11 @@ def main() -> None:
     matrix.to_csv(ARTIFACTS / "confusion_matrix.csv", encoding="utf-8-sig")
     importances.to_csv(ARTIFACTS / "feature_importance.csv", index=False, encoding="utf-8-sig")
     scored.to_csv(ARTIFACTS / "test_predictions.csv", index=False, encoding="utf-8-sig")
+    scored.to_csv(
+        ROOT / "data" / "ml_diagnosis_predictions.csv",
+        index=False,
+        encoding="utf-8-sig",
+    )
     joblib.dump(pipeline, ARTIFACTS / "diagnosis_model.joblib", compress=3)
 
     figure, axis = plt.subplots(figsize=(9, 6))

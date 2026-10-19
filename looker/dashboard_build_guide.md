@@ -32,6 +32,17 @@ Fuentes: `v_experiment_results`, `v_experiment_lift`, `v_roaming_costs`.
 - Nota visible: “Resultados simulados; no representan impacto real”.
 - Roaming: MB y costo por país; comparación por bitrate cap.
 
+## Página 4 — Predicción y prevención
+
+Fuentes: `v_ml_risk_dashboard`, `v_ml_diagnosis_dashboard`, `v_ml_model_metrics`.
+
+- Tarjetas: ROC-AUC, recall, PR-AUC y balanced accuracy diagnóstica.
+- Dona: sesiones por nivel de riesgo.
+- Barras: riesgo promedio por plataforma.
+- Barras: causas reales frente a causas predichas.
+- Tabla priorizada: sesión, zona, plataforma, riesgo y resultado real.
+- Nota visible: “Métricas calculadas sobre holdout sintético; no representan desempeño productivo”.
+
 ## Estilo recomendado
 
 - Fondo blanco, tarjetas gris muy claro y acento violeta.
