@@ -23,11 +23,11 @@ positivos. Así se evita obtener métricas artificialmente perfectas.
 
 | Métrica | Resultado |
 |---|---:|
-| Accuracy en prueba | 78,96% |
-| Balanced accuracy en prueba | 77,89% |
-| Macro F1 en prueba | 77,18% |
+| Accuracy en prueba | 78,66% |
+| Balanced accuracy en prueba | 77,41% |
+| Macro F1 en prueba | 76,63% |
 | Balanced accuracy de línea base | 25,00% |
-| Balanced accuracy CV (5 folds) | 77,75% ± 2,67 pp |
+| Balanced accuracy CV (5 folds) | 78,60% ± 2,49 pp |
 
 ![Matriz de confusión](../ml/artifacts/confusion_matrix.png)
 

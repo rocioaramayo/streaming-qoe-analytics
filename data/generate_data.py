@@ -201,16 +201,41 @@ for user_id, variant, zone, platform, tier, assignment in users:
         add_event(base, "stream_start", session_start, live_latency_ms=rng.randrange(3500, 9000), bitrate_kbps=rng.randrange(2200, 6500))
 
         heartbeat_count = rng.randrange(2, 6)
+        will_emit_incident = bool(assignment["activated"] and not incident_emitted)
+        if will_emit_incident:
+            degradation_strength = rng.uniform(0.30, 1.0)
+        elif rng.random() < 0.24:
+            # Transient degradation that recovers without becoming a microcut.
+            degradation_strength = rng.uniform(0.25, 0.85)
+        else:
+            degradation_strength = rng.uniform(0.0, 0.18)
         for heartbeat in range(1, heartbeat_count + 1):
             ts = session_start + timedelta(minutes=heartbeat)
-            wifi = "" if roaming else rng.randrange(-72, -42)
+            progress = heartbeat / heartbeat_count
+            # Positive and negative windows overlap. Some incidents have only a
+            # weak warning and some healthy sessions show transient degradation.
+            latency = bounded_int(
+                rng.gauss(7600 + progress * 8200 * degradation_strength, 3100),
+                3000,
+                27000,
+            )
+            bitrate = bounded_int(
+                rng.gauss(4700 - progress * 2200 * degradation_strength, 950),
+                700,
+                6800,
+            )
+            wifi = "" if roaming else bounded_int(
+                rng.gauss(-57 - progress * 12 * degradation_strength, 7),
+                -90,
+                -40,
+            )
             add_event(
                 base,
                 "live_playback_heartbeat",
                 ts,
                 wifi_rssi_dbm=wifi,
-                live_latency_ms=rng.randrange(4200, 14500),
-                bitrate_kbps=rng.randrange(1900, 6800),
+                live_latency_ms=latency,
+                bitrate_kbps=bitrate,
             )
 
         if roaming:

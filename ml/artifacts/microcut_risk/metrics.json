@@ -1,0 +1,32 @@
+{
+  "model": "RandomForestClassifier",
+  "seed": 20261019,
+  "dataset": "synthetic",
+  "prediction_horizon_minutes": 5,
+  "window_rows": 6775,
+  "positive_rate": 0.4841328413284133,
+  "train_rows": 5443,
+  "test_rows": 1332,
+  "train_users": 3200,
+  "test_users": 800,
+  "user_overlap": 0,
+  "test_accuracy": 0.7995495495495496,
+  "test_balanced_accuracy": 0.7997091581368083,
+  "test_precision": 0.7825464949928469,
+  "test_recall": 0.8262839879154078,
+  "test_f1": 0.8038207200587804,
+  "test_roc_auc": 0.8622491770753483,
+  "test_pr_auc": 0.8345354403732312,
+  "baseline_roc_auc": 0.5,
+  "baseline_pr_auc": 0.496996996996997,
+  "cv_balanced_accuracy_mean": 0.7840925829075265,
+  "cv_balanced_accuracy_std": 0.016056313585100613,
+  "cv_roc_auc_mean": 0.8500630149771977,
+  "cv_pr_auc_mean": 0.806818002170911,
+  "leakage_controls": [
+    "features end before the prediction horizon",
+    "labels use only future microcut events within five minutes",
+    "train and test users are disjoint",
+    "diagnosis and resolution fields are excluded"
+  ]
+}

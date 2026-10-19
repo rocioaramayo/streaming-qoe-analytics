@@ -1,9 +1,27 @@
-# Modelo de diagnóstico inteligente
+# Machine Learning para prevención y diagnóstico
+
+El proyecto contiene dos modelos complementarios.
+
+## 1. Alerta temprana
+
+Predice si una sesión sufrirá un microcorte en los próximos cinco minutos usando
+solo telemetría anterior al evento. Entrenamiento e inferencia:
+
+```powershell
+python ml/train_microcut_risk_model.py
+python ml/predict_microcut_risk.py
+```
+
+La separación se realiza por usuario, por lo que ninguna persona aparece a la
+vez en entrenamiento y prueba. Los resultados y limitaciones se documentan en
+`docs/prevention_model_card.md`.
+
+## 2. Diagnóstico de causa raíz
 
 Clasificador multiclase que predice la causa raíz de un microcorte usando la
 telemetría disponible en el momento de detección.
 
-## Objetivo
+### Objetivo
 
 Predecir una de estas causas:
 
@@ -12,7 +30,7 @@ Predecir una de estas causas:
 - `EXTERNAL_ZONE`
 - `NETWORK_OR_CDN`
 
-## Variables utilizadas
+### Variables utilizadas
 
 Se usan intensidad de Wi-Fi, latencia, bitrate, duración del corte, plataforma,
 plan, conexión, estado eléctrico, temperatura, alerta externa y nodo AMBA.
@@ -21,7 +39,7 @@ No se utilizan el diagnóstico registrado, el resultado de resolución ni la
 solicitud de visita técnica como variables de entrada. Esto evita fuga de
 información desde el futuro.
 
-## Entrenamiento
+### Entrenamiento
 
 ```powershell
 python ml/train_diagnosis_model.py
@@ -37,7 +55,7 @@ folds, comparación contra una línea base y genera:
 - `test_predictions.csv`
 - `diagnosis_model.joblib`
 
-## Inferencia de ejemplo
+### Inferencia de ejemplo
 
 ```powershell
 python ml/predict_incident.py

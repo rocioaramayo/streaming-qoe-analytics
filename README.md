@@ -1,16 +1,17 @@
 # Streaming QoE Analytics
 
-Caso de estudio end-to-end para monitorear la calidad de experiencia (QoE) de una plataforma de streaming, diagnosticar microcortes con Machine Learning y evaluar mediante un experimento A/B un flujo de autogestión.
+Caso de estudio end-to-end para anticipar y diagnosticar microcortes de streaming con Machine Learning, y evaluar mediante un experimento A/B un flujo de autogestión.
 
 > **Aviso:** proyecto independiente de portfolio, construido con datos 100% sintéticos. No representa información, resultados ni una implementación oficial de Personal Flow.
 
 ## Qué demuestra
 
 - Diseño de tracking con eventos compatibles con un modelo GA4/Firebase.
-- Generación reproducible de 4.000 usuarios y 39.030 eventos.
+- Generación reproducible de 4.000 usuarios y 39.199 eventos.
 - Asignación A/B estable por usuario, sin contaminación entre variantes.
 - Modelado y análisis en BigQuery con controles de calidad.
-- Modelo supervisado y explicable para clasificar la causa raíz de los microcortes.
+- Modelo preventivo para estimar el riesgo de microcorte en los próximos cinco minutos.
+- Modelo diagnóstico para clasificar la causa raíz después de detectar el incidente.
 - Diseño de un dashboard ejecutivo en Looker Studio.
 - Prototipo web instrumentado con Firebase Analytics y Remote Config.
 - Traducción de señales técnicas en KPIs de experiencia y costos operativos.
@@ -31,7 +32,8 @@ flowchart LR
     D[Remote Config\nvariantes y bitrate] --> A
     B --> E[SQL de calidad\ny métricas]
     E --> F[Looker Studio\n3 páginas]
-    B --> G[Machine Learning\nclasificación de causa raíz]
+    B --> G[ML preventivo\nriesgo a 5 minutos]
+    G --> H[ML diagnóstico\nclasificación de causa raíz]
 ```
 
 Para publicar el proyecto hoy, los CSV se cargan manualmente en BigQuery. La exportación nativa de Firebase puede tardar hasta 48 horas, por lo que queda documentada como evolución de la arquitectura.
@@ -81,19 +83,26 @@ El generador usa una semilla fija (`20261015`) y conserva una sola variante por 
 
 ## Machine Learning
 
-El módulo `ml/` entrena un Random Forest para clasificar la causa raíz de cada
-microcorte a partir de señales técnicas disponibles al detectar el incidente.
-Incluye partición estratificada, validación cruzada, línea base, matriz de
-confusión, importancia de variables, predicciones de prueba y modelo serializado.
+El módulo `ml/` contiene dos modelos complementarios:
 
-Resultados sobre el conjunto de prueba sintético: **78,96% de accuracy**,
-**77,89% de balanced accuracy** y **77,18% de macro F1**, frente a una línea base
-de **25% de balanced accuracy**. Ver metodología y limitaciones en
-[`docs/model_card.md`](docs/model_card.md).
+1. **Alerta temprana:** estima el riesgo de microcorte en los próximos cinco
+   minutos a partir de las últimas señales de latencia, bitrate y Wi-Fi.
+2. **Diagnóstico:** clasifica la causa raíz después de detectar el incidente.
+
+Ambos incluyen validación cruzada, comparación con línea base, importancia de
+variables, predicciones de prueba y modelos serializados.
+
+El predictor preventivo obtuvo **86,22% de ROC-AUC**, **83,45% de PR-AUC** y
+**82,63% de recall**. El clasificador diagnóstico obtuvo **77,41% de balanced
+accuracy**, frente a una línea base de 25%. Los resultados corresponden a datos
+sintéticos. Ver [`docs/prevention_model_card.md`](docs/prevention_model_card.md)
+y [`docs/model_card.md`](docs/model_card.md).
 
 ```powershell
 python ml/train_diagnosis_model.py
 python ml/predict_incident.py
+python ml/train_microcut_risk_model.py
+python ml/predict_microcut_risk.py
 ```
 
 Los datos son sintéticos y las métricas no deben interpretarse como rendimiento
